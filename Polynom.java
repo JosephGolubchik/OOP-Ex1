@@ -1,5 +1,6 @@
 package myMath;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Predicate;
@@ -9,6 +10,10 @@ import javax.management.RuntimeErrorException;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYSeries;
+import org.knowm.xchart.style.colors.XChartSeriesColors;
+import org.knowm.xchart.style.lines.SeriesLines;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 
 import myMath.Monom;
 /**
@@ -338,9 +343,16 @@ public class Polynom implements Polynom_able{
 	
 	public void draw(double x0, double x1, int steps) {
 		double[][] initdata = getFunctionData(x0, x1, steps);
+		double[] xData = {0};
+		double[] yData = {f(0)};
 		  
 		  // Create Chart
 		  XYChart chart = QuickChart.getChart("Sample Chart", "X", "Y", this.toString(), initdata[0], initdata[1]);
+		  XYSeries series = chart.addSeries("Fake Data", xData, yData);
+		  series.setLineColor(XChartSeriesColors.BLUE);
+		    series.setMarkerColor(Color.RED);
+		    series.setMarker(SeriesMarkers.CIRCLE);
+		    series.setLineStyle(SeriesLines.SOLID);
 		  
 		  // Show it
 		  new SwingWrapper(chart).displayChart();
