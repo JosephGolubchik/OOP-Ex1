@@ -26,6 +26,9 @@ public class Monom implements function{
 		if (b < 0) {
 			throw new RuntimeException("Power has to be non-negative");
 		}
+		if (a == 0) {
+			b = 0;
+		}
 		this.set_coefficient(a);
 		this.set_power(b);
 	}
@@ -87,6 +90,9 @@ public class Monom implements function{
 		if(m.get_power()==this.get_power()) {
 			this.set_coefficient(this.get_coefficient()+m.get_coefficient());
 		}
+		else {
+			throw new RuntimeException("Powers of the monoms should be equal");
+		}
 	}
 	/**
 	 * Multiplies the current monom by a given monom x.
@@ -101,11 +107,33 @@ public class Monom implements function{
 	 * Converts the current monom to a string.
 	 * @return A string version of the current monom.
 	 */
-	public String toString() {
-		if (this.get_power() == 0) return "" + this.get_coefficient();
-		else if (this.get_coefficient() == 0) return "";
-		else if (this.get_power() == 1) return "" + this.get_coefficient() + "X";
-		else return this.get_coefficient() + "X^"+ this.get_power();
+	public String toString() {	
+		double a = this.get_coefficient();
+		int b = this.get_power();
+		
+		if (a == 0) {
+			return "0";
+		}
+		if (b == 0) {
+			return "" + a;
+		}
+		if (a == 1) {
+			if (b == 0) {
+				return "1";
+			}
+			if (b == 1) {
+				return "x";
+			}
+			else {
+				return "x^" + b;
+			}
+		}
+		if (b == 1 && a != 0 && a != 1) {
+			return "" + a + "x";
+		}
+		else {
+			return "" + a + "x^" + b;
+		}
 	}
 	/**
 	 * Checks whether the current monom's coefficient is zero.
@@ -143,57 +171,85 @@ public class Monom implements function{
 	 * @param s String to be converted into a monom.
 	 * @return A monom constructed from the string.
 	 */
+	
 	private static Monom init_from_string(String s){
-		if(s==null){throw new RuntimeException("ERR -> String is null");}
+		if(s==null){
+			throw new RuntimeException("String is null");
+		}
 		double a=0;
 		int b=0;
-		String in=s.toLowerCase();
-		int ind_x= in.indexOf("x");
-		if(ind_x<0){
-			try{
-				a=Double.parseDouble(in);
+		String in = s.toLowerCase();
+		int ind_x = in.indexOf("x");
+		int ind_p = in.indexOf("^");
+		if (ind_x < 0) {
+			try {
+				a = Double.parseDouble(in);
 			}
-			catch(Exception e){
-				throw new RuntimeException("Invalid String");
+			catch(Exception ex) {
+				System.out.println(ex);
 			}
 		}
-		else{
-			String c= in.substring(0,ind_x);
-			int ind_p=in.indexOf("^");
-			if(ind_p<0){
-				if (ind_x != s.length()-1) {
-					throw new RuntimeException("Invalid String");
-				}
-			b=1;
-			if (in.substring(0,ind_x).equals("")) {
-				a = 1;
-			}
-			else a = Double.parseDouble(in.substring(0,ind_x));
-			}
-			else{
-				try{
-					b=Integer.parseInt(in.substring(ind_p+1));
-					if(in.indexOf("-") == 0) {
-						if (ind_x == 1) {
-							a = -1;
+		else {
+			if (ind_p < 0) {
+				try {
+					if (in.endsWith("x")) {
+						String coef = in.substring(0, ind_x);
+						if (!coef.isEmpty()) {
+							try {
+								a = Double.parseDouble(coef);
+							}
+							catch(Exception ex) {
+								System.out.println(ex);
+							}
 						}
 						else {
-							a = Double.parseDouble(in.substring(1,ind_x));
-
+							a = b = 1;
 						}
 					}
 					else {
-						a = Double.parseDouble(in.substring(0,ind_x));
+						throw new RuntimeException("Invalid string, x should be the last char");
 					}
 				}
-				catch(Exception e){
-					throw new RuntimeException("Invalid String");
+				catch(Exception ex) {
+					System.out.println(ex);
+				}
+			}
+			else {
+				if (ind_p == ind_x + 1) {
+					String pow = in.substring(ind_p + 1);
+					if (pow.isEmpty()) {
+						throw new RuntimeException("Invalid string, nothing after '^'");
+					}
+					else {
+						try {
+							b = Integer.parseInt(pow);
+						}
+						catch(Exception ex) {
+							System.out.println(ex);
+						}
+					}
+					String coef = in.substring(0, ind_x);
+					if (!coef.isEmpty()) {
+						try {
+							a = Double.parseDouble(coef);
+						}
+						catch(Exception ex) {
+							System.out.println(ex);
+						}
+					}
+					else {
+						a = 1;
+					}
+				}
+				else {
+					throw new RuntimeException("Invalid string, 'x...^' ");
 				}
 			}
 		}
+		
+		
 		return new Monom(a,b);
 	}
-	
 
 	private double _coefficient; // 
 	private int _power; 
