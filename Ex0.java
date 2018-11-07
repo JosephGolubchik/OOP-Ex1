@@ -14,7 +14,7 @@ public class Ex0 {
 		p0.draw(-2, 6, 100);
 		
 		
-		
+		 
 	}
 	
 	
