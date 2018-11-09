@@ -1,19 +1,10 @@
 package myMath;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
 import javax.management.RuntimeErrorException;
-
-import org.knowm.xchart.QuickChart;
-import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.XYChart;
-import org.knowm.xchart.XYSeries;
-import org.knowm.xchart.style.colors.XChartSeriesColors;
-import org.knowm.xchart.style.lines.SeriesLines;
-import org.knowm.xchart.style.markers.SeriesMarkers;
 
 import myMath.Monom;
 /**
@@ -37,7 +28,7 @@ public class Polynom implements Polynom_able{
 	 * default constructor
 	 */
 	public Polynom(){
-		
+		list.add(new Monom("0"));
 	}
 	/**
 	 * constructs a polynom from a string
@@ -90,6 +81,7 @@ public class Polynom implements Polynom_able{
 			Monom x = it.next();
 			this.add(x);
 		}
+		removeZero();
 	}
 
 	/**
@@ -110,7 +102,7 @@ public class Polynom implements Polynom_able{
 			list.add(m1);
 			list.sort(cmp);
 		}
-		
+		removeZero();
 	}
 	/**
 	 * Subtracts from the current polynom the given polynom p1.
@@ -131,6 +123,7 @@ public class Polynom implements Polynom_able{
 			Monom x = it.next();
 			if (x.isZero()) this.list.remove(x);
 		}
+		removeZero();
 	}
 	/**
 	 * Subtracts from the current polynom the given monom m1.
@@ -146,6 +139,7 @@ public class Polynom implements Polynom_able{
 			Monom x = it.next();
 			if (x.isZero()) this.list.remove(x);
 		}
+		removeZero();
 	}
 	/**
 	 * Multiplies the current polynom by a given polynom p1.
@@ -171,7 +165,7 @@ public class Polynom implements Polynom_able{
 		
 		this.substract(copy);
 		this.add(sum);
-		
+		removeZero();
 	}
 
 	/**
@@ -202,7 +196,19 @@ public class Polynom implements Polynom_able{
 	 */
 	@Override
 	public boolean isZero() {
-		return this.list.size() == 0;
+		Polynom zero = new Polynom("0");
+		return this.equals(zero);
+	}
+	
+	public void removeZero() {
+//		Iterator<Monom> it = this.iteretor();
+//		Monom last = new Monom();
+//		while(it.hasNext()) {
+//			last = it.next();
+//		}
+//		if (last.isZero()) {
+//			it.remove();
+//		}
 	}
 
 	/**
@@ -313,7 +319,16 @@ public class Polynom implements Polynom_able{
 		else {
 			ans = list.get(0).toString();
 			for (int i = 1; i < list.size(); i++) {
-				ans = ans + " + " + list.get(i).toString();
+				Monom curr_monom = list.get(i);
+				String curr_monom_string = curr_monom.toString();
+				if (!curr_monom_string.equals("0")) {
+					if (curr_monom.get_coefficient() > 0) {
+						ans = ans + " + " + curr_monom_string;
+					}
+					else {
+						ans = ans + " - " + curr_monom_string.substring(1);
+					}
+				}
 			}
 		}
 		return ans;
@@ -325,55 +340,30 @@ public class Polynom implements Polynom_able{
 	 * @return A polynom constructed from the string.
 	 */
 	private Polynom init_from_string(String s) {
+		String tmp_sign = "+";
 		if (s == null) {
 			throw new RuntimeException("String is empty");
 		}
-		String[] string_monoms = s.split(" ");
+		String[] string_monoms = s.split(" "); //["3x^2", "+", "%", "2x", "+", "5"]
 		Polynom pnew = new Polynom();
 		for (int i = 0; i < string_monoms.length; i++) {
 			String s_monom = string_monoms[i];
-			if (!s_monom.equals("+") ){
-				Monom m = new Monom(s_monom);
-				if (m.get_coefficient() != 0)
-					pnew.add(m);
+			if(s_monom.equals("+") || s_monom.equals("-")) {
+				tmp_sign = s_monom;
+			}
+			if (!s_monom.equals("+") &&  !s_monom.equals("-")){
+				try {
+					Monom m = new Monom(s_monom);
+					if (!m.isZero() && tmp_sign.equals("+"))
+						pnew.add(m);
+					if (!m.isZero() && tmp_sign.equals("-"))
+						pnew.substract(m);
+				}
+				catch(Exception ex) {
+					System.err.println(ex);
+				}
 			}
 		}
 		return pnew;
 	}
-	
-	public void draw(double x0, double x1, int steps) {
-		double[][] initdata = getFunctionData(x0, x1, steps);
-		double[] xData = {0};
-		double[] yData = {f(0)};
-		  
-		  // Create Chart
-		  XYChart chart = QuickChart.getChart("Sample Chart", "X", "Y", this.toString(), initdata[0], initdata[1]);
-		  XYSeries series = chart.addSeries("Fake Data", xData, yData);
-		  series.setLineColor(XChartSeriesColors.BLUE);
-		    series.setMarkerColor(Color.RED);
-		    series.setMarker(SeriesMarkers.CIRCLE);
-		    series.setLineStyle(SeriesLines.SOLID);
-		  
-		  // Show it
-		  new SwingWrapper(chart).displayChart();
-		  
-//		  // Save it
-//		  BitmapEncoder.saveBitmap(chart, "./Simple_Graph", BitmapFormat.PNG);
-	}
-	
-	public double[][] getFunctionData(double x0, double x1, int steps) {
-		int length = (int) (x1 - x0);
-		double step_size = length/(double)(steps);
-		double current_x = x0;
-		double[] xData = new double[steps];
-		double[] yData = new double[steps];
-		for (int i = 0; i < xData.length; i++) {
-			xData[i] = current_x;
-			yData[i] = f(current_x);
-			current_x += step_size;
-		}
-		return new double[][] { xData, yData };
-	}
-	
-	
 }

@@ -95,6 +95,19 @@ public class Monom implements function{
 		}
 	}
 	/**
+	 * Substracts from the current monom the given monom m.
+	 * @param m Monom to be substracted.
+	 */
+	public void substract(Monom m) {
+
+		if(m.get_power()==this.get_power()) {
+			this.set_coefficient(this.get_coefficient()-m.get_coefficient());
+		}
+		else {
+			throw new RuntimeException("Powers of the monoms should be equal");
+		}
+	}
+	/**
 	 * Multiplies the current monom by a given monom x.
 	 * @param x Monom to be multiplied by.
 	 */
@@ -173,8 +186,11 @@ public class Monom implements function{
 	 */
 	
 	private static Monom init_from_string(String s){
-		if(s==null){
+		if (s==null) {
 			throw new RuntimeException("String is null");
+		}
+		if (s.isEmpty()) {
+			throw new RuntimeException("String is empty");
 		}
 		double a=0;
 		int b=0;
@@ -197,6 +213,7 @@ public class Monom implements function{
 						if (!coef.isEmpty()) {
 							try {
 								a = Double.parseDouble(coef);
+								b = 1;
 							}
 							catch(Exception ex) {
 								System.out.println(ex);

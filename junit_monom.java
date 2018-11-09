@@ -22,7 +22,7 @@ class junit_monom {
 		Monom m0 = new Monom(2,4);
 		Monom m1 = new Monom(m0);
 		if (!m0.equals(m1))
-			fail("m0 and m1 are not equal, copy ctor doesn't work.");
+			fail("m0 and m1 should be equal, copy ctor doesn't work.");
 	}
 	
 	@Test
@@ -58,6 +58,33 @@ class junit_monom {
 	}
 	
 	@Test
+	void testMonomStringCtor5() {
+		String[] bad_strings = {null, "", "a", "3^2", "x^a", "++","--","@$&%","**","//","+x","*x","/x","%x"};
+		assertThrows(Exception.class,
+	            ()->{
+	            	for (int i = 0; i < bad_strings.length; i++) {
+	            		new Monom(bad_strings[i]);
+					}
+	            });
+		
+	}
+	
+	@Test
+	void testMonomStringCtor6() {
+		String[] good_strings = {"0", "3", "x", "3x", "3x^2","-x","-3"};
+		try {
+			for (int i = 0; i < good_strings.length; i++) {
+        		new Monom(good_strings[i]);
+			}
+		}
+		catch(Exception ex) {
+			System.err.println(ex);
+			fail("String should not throw exception ");
+		}
+		
+	}
+	
+	@Test
 	void testMonomValueAtX() {
 		Monom m = new Monom(3,2);
 		double x = 2;
@@ -90,6 +117,28 @@ class junit_monom {
 		}
 		if(m2.get_power()!=m0.get_power()) {
 			fail("Power should be 3 , but is " + m2.get_power());
+		}
+	}
+	
+	@Test
+	void testSubstract1() {
+		Monom m0 = new Monom(2,3);
+		Monom m1 = new Monom(4,3);
+		Monom m2 = new Monom("-2x^3");
+		m0.substract(m1);
+		if (!m0.equals(m2)) {
+			fail("Monom should be " + m2 + " but is " + m0);
+		}
+	}
+	
+	@Test
+	void testSubstract2() {
+		Monom m0 = new Monom(2,3);
+		Monom m1 = new Monom(-4,3);
+		Monom m2 = new Monom("6x^3");
+		m0.substract(m1);
+		if (!m0.equals(m2)) {
+			fail("Monom should be " + m2 + " but is " + m0);
 		}
 	}
 	
