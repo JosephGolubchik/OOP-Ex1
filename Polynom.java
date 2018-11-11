@@ -19,7 +19,7 @@ import myMath.Monom;
  */
 public class Polynom implements Polynom_able{
 
-	// ********** add your code below ***********
+	// *********** add your code below ************
 	/**
 	 * An arraylist that contains the monoms that make up the polynom.
 	 */
