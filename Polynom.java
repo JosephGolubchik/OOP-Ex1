@@ -6,6 +6,10 @@ import java.util.function.Predicate;
 
 import javax.management.RuntimeErrorException;
 
+import org.knowm.xchart.QuickChart;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChart;
+
 import myMath.Monom;
 /**
  * This class represents a Polynom with add, multiply functionality, it also should support the following:
@@ -19,7 +23,7 @@ import myMath.Monom;
  */
 public class Polynom implements Polynom_able{
 
-	// *********** add your code below ************
+	// ********** add your code below ***********
 	/**
 	 * An arraylist that contains the monoms that make up the polynom.
 	 */
@@ -333,7 +337,78 @@ public class Polynom implements Polynom_able{
 		}
 		return ans;
 	}
-	
+	public void draw(double x0, double x1) {
+		double[][] values = getValues(x0,x1);
+	    double[] xData = values[0];
+	    double[] yData = values[1];
+	    
+	    double[] xAxisXData = { x0, x1 };
+	    double[] xAxisYData = { 0, 0 };
+	    
+	    double[] yAxisXData = { 0, 0 };
+	    double[] yAxisYData = { -20, 20 };
+	 
+	    // Create Chart
+	    XYChart chart = QuickChart.getChart("Sample Chart", "X", "Y", "y(x)", xData, yData);
+	    chart.addSeries("X Axis", xAxisXData, xAxisYData);
+	    chart.addSeries("Y Axis", yAxisXData, yAxisYData);
+	    ArrayList<Double> maxMinPoints = getMaxMinX(xData, yData);
+	    for (int i = 0; i < maxMinPoints.size(); i++) {
+	    	double[] x = {maxMinPoints.get(i)};
+	    	double[] y = {f(maxMinPoints.get(i))};
+	    	chart.addSeries("("+x[0]+","+y[0]+")", x, y);
+		}
+	 
+	    // Show it
+	    new SwingWrapper(chart).displayChart();
+	    
+	    Polynom inverse = new Polynom(this);
+	    inverse.multiply(new Polynom("-1"));
+	    double area = inverse.area(x0, x1, 0.01);
+	    System.out.println("The area under the X axis and above the function: " + area);
+	}
+	private double[][] getValues(double x0, double x1) {
+		  int num_points = 10000;
+		  double length = x1 - x0;
+		  double[] xData = new double[num_points+1];
+		  double[] yData = new double[num_points+1];
+		  xData[0] = x0;
+		  xData[num_points] = x1;
+		  for (int i = 1; i < xData.length; i++) {
+			xData[i] = xData[i-1] + length/num_points;
+		  }
+		  for (int i = 0; i < yData.length; i++) {
+			yData[i] = f(xData[i]);
+		  }
+		  double[][] values = new double[2][num_points];
+		  values[0] = xData;
+		  values[1] = yData;
+		  
+		  return values;
+		  
+	  }
+	private ArrayList<Double> getMaxMinX(double[] xData, double[] yData) {
+		  double eps = 0.01;
+		  double min_x_dist = 0.01;
+		  ArrayList<Double> points = new ArrayList<Double>();
+		  Polynom derivative = (Polynom) derivative();
+		  double maxima_x = 0;
+		  for (int i = 0; i < yData.length; i++) {
+			  double curr_x = xData[i];
+			  if (derivative.f(curr_x) >= -eps && derivative.f(curr_x) <= eps) {
+				  if (i == 0) {
+					  points.add(curr_x);
+					  maxima_x = curr_x;
+					  
+				  }
+				  else if (i > 0 && Math.abs(maxima_x - curr_x) > min_x_dist) {
+					  points.add(curr_x);
+					  maxima_x = curr_x;
+				  }
+			  }
+		  }
+		  return points;
+	  }
 	/**
 	 * A helper function for the constructor that gets a string.
 	 * @param s String to be converted into a polynom.
@@ -366,4 +441,6 @@ public class Polynom implements Polynom_able{
 		}
 		return pnew;
 	}
+	
+	
 }

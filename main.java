@@ -84,9 +84,8 @@ public class main {
 //	Polynom expected = new Polynom("5x^3 + 2x^2 - 4x + 5");
 //	System.out.println(expected);
 		
-	Polynom p = new Polynom("x^3 - 2x^2 + 0.5");
-	double ans = p.root(-0.6, -0.2, 0.0001);
-	System.out.println(ans);
+	Polynom p = new Polynom("0.2x^4 - 1.5x^3 + 3x^2 - x - 5");
+	p.draw(-2,6);
 
 		
 	}
