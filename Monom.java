@@ -168,7 +168,6 @@ public class Monom implements function{
 
 
 
-
 	//****************** Private Methods and Data *****************
 
 	private void set_coefficient(double a){
