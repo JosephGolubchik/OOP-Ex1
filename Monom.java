@@ -271,3 +271,4 @@ public class Monom implements function{
 	private double _coefficient; // 
 	private int _power; 
 }
+
