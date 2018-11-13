@@ -444,3 +444,4 @@ public class Polynom implements Polynom_able{
 	
 	
 }
+
