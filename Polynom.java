@@ -33,7 +33,7 @@ public class Polynom implements Polynom_able{
 	 */
 	public Polynom(){
 		list.add(new Monom("0"));
-	}
+	} 
 	/**
 	 * constructs a polynom from a string
 	 * @param s
