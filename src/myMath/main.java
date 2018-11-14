@@ -84,8 +84,11 @@ public class main {
 //	Polynom expected = new Polynom("5x^3 + 2x^2 - 4x + 5");
 //	System.out.println(expected);
 		
-	Polynom p = new Polynom("0.2x^4 - 1.5x^3 + 3x^2 - x - 5");
-	p.draw(-2,6);
+	Polynom p0 = new Polynom("0.2x^4 - 1.5x^3 + 3x^2 - x - 5");
+	Polynom p1 = new Polynom("x^3");
+	Polynom p2 = new Polynom("0.001x^2");
+
+	p0.draw(-2,6);
 
 		
 	}

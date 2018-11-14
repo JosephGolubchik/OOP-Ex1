@@ -15,6 +15,7 @@ import org.knowm.xchart.style.colors.XChartSeriesColors;
 import org.knowm.xchart.style.lines.SeriesLines;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 
+import javafx.scene.chart.XYChartBuilder;
 import myMath.Monom;
 /**
  * This class represents a Polynom with add, multiply functionality, it also should support the following:
@@ -342,19 +343,34 @@ public class Polynom implements Polynom_able{
 		}
 		return ans;
 	}
+	/**
+	 * Draws the graph of the polynom for x values from x0 to x1
+	 * Marks the Maximum and Minimum points on the graph
+	 * Calculates the area above the polynom and below the x axis, and prints it to the console
+	 * @param x0 beginning of the drawing range
+	 * @param x1 ending of the drawing range
+	 */
 	public void draw(double x0, double x1) {
 		double[][] values = getValues(x0,x1);
 	    double[] xData = values[0];
 	    double[] yData = values[1];
 	    
+	    double max_y = yData[0];
+	    double min_y = yData[0];
+	    for (int i = 1; i < yData.length; i++) {
+			if (yData[i] > max_y) max_y = yData[i];
+			if (yData[i] < min_y) min_y = yData[i];
+		}
+	    double y_range = Math.abs(max_y - min_y);
+	    
 	    double[] xAxisXData = { x0, x1 };
 	    double[] xAxisYData = { 0, 0 };
 	    
 	    double[] yAxisXData = { 0, 0 };
-	    double[] yAxisYData = { -20, 20 };
+	    double[] yAxisYData = { min_y - y_range*0.2, max_y + y_range*0.2};
 	 
-	    // Create Chart
 	    XYChart chart = QuickChart.getChart("Sample Chart", "X", "Y", this.toString(), xData, yData);
+
 	    
 	    XYSeries xAxis = chart.addSeries("X Axis", xAxisXData, xAxisYData);
 	    XYSeries yAxis = chart.addSeries("Y Axis", yAxisXData, yAxisYData);
@@ -365,11 +381,14 @@ public class Polynom implements Polynom_able{
 	    yAxis.setMarker(SeriesMarkers.NONE);
 	    yAxis.setLineStyle(SeriesLines.SOLID);
 	    
-	    ArrayList<Double> maxMinPoints = getMaxMinX(xData, yData);
+	    ArrayList<Double> maxMinPoints = getMaxMinX(xData, yData, y_range);
 	    for (int i = 0; i < maxMinPoints.size(); i++) {
 	    	double[] x = {maxMinPoints.get(i)};
 	    	double[] y = {f(maxMinPoints.get(i))};
-	    	chart.addSeries("("+x[0]+","+y[0]+")", x, y).setMarker(SeriesMarkers.CIRCLE);
+	    	chart.addSeries("("+x[0]+","+y[0]+")", x, y)
+	    	.setMarker(SeriesMarkers.CIRCLE)
+	    	.setMarkerColor(XChartSeriesColors.RED)
+	    	.setLineColor(XChartSeriesColors.LIGHT_GREY);
 		}
 	 
 	    // Show it
@@ -382,7 +401,7 @@ public class Polynom implements Polynom_able{
 	    System.out.println("The area under the X axis and above the function: " + area);
 	}
 	private double[][] getValues(double x0, double x1) {
-		  int num_points = 10000;
+		  int num_points = 1000;
 		  double length = x1 - x0;
 		  double[] xData = new double[num_points+1];
 		  double[] yData = new double[num_points+1];
@@ -401,15 +420,17 @@ public class Polynom implements Polynom_able{
 		  return values;
 		  
 	  }
-	private ArrayList<Double> getMaxMinX(double[] xData, double[] yData) {
-		  double eps = 0.01;
-		  double min_x_dist = 0.01;
+	private ArrayList<Double> getMaxMinX(double[] xData, double[] yData, double y_range) {
+		  double eps = y_range*0.001;
+		  double min_x_dist = xData.length*0.001;
 		  ArrayList<Double> points = new ArrayList<Double>();
 		  Polynom derivative = (Polynom) derivative();
-		  double maxima_x = 0;
+		  double maxima_x = Integer.MIN_VALUE;
 		  for (int i = 0; i < yData.length; i++) {
 			  double curr_x = xData[i];
-			  if (derivative.f(curr_x) >= -eps && derivative.f(curr_x) <= eps) {
+			  if ( (derivative.f(curr_x) >= -eps && derivative.f(curr_x) <= eps)
+				  && ((derivative.f(curr_x-1) > 0 && derivative.f(curr_x+1) < 0)
+				  || (derivative.f(curr_x-1) < 0 && derivative.f(curr_x+1) > 0)) ) {
 				  if (i == 0) {
 					  points.add(curr_x);
 					  maxima_x = curr_x;
