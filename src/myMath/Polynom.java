@@ -347,7 +347,7 @@ public class Polynom implements Polynom_able{
 	 * Draws the graph of the polynom for x values from x0 to x1
 	 * Marks the Maximum and Minimum points on the graph
 	 * Calculates the area above the polynom and below the x axis, and prints it to the console
-	 * We used the opensource xchart library to draw the function
+	 * We used the open-source xchart library to draw the function
 	 * https://github.com/knowm/XChart
 	 * @param x0 beginning of the drawing range
 	 * @param x1 ending of the drawing range
