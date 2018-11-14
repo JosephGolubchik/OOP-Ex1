@@ -12,7 +12,7 @@ public class Ex0 {
 
 		Polynom p0 = new Polynom("0.2x^4 + -1.5x^3 + 3x^2 + -1x + -5");
 		p0.draw(-2, 6, 100);
-//		test
+//		test2
 		
 		
 		 
